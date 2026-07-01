@@ -1,0 +1,14 @@
+{
+  "name": "freechat",
+  "private": true,
+  "version": "0.1.0",
+  "description": "A private chat platform for an uncensored, self-controlled LLM.",
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev --workspace server",
+    "dev:web": "npm run dev --workspace web"
+  }
+}
