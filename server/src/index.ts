@@ -1,11 +1,19 @@
+import "dotenv/config";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
+import { loadConfig } from "./config.js";
+import { LLMRegistry } from "./llm/registry.js";
+import { chatRoutes } from "./routes/chat.js";
+
+const config = loadConfig();
+const registry = new LLMRegistry(config);
 
 const app = new Hono();
 
-// Slice 1: liveness only. The OpenRouter streaming proxy arrives in slice 2.
 app.get("/health", (c) => c.json({ ok: true, service: "freechat-server" }));
 
-const port = Number(process.env.PORT ?? 8787);
-serve({ fetch: app.fetch, port });
-console.log(`freechat-server listening on http://localhost:${port}`);
+// All app endpoints live under /api (the web dev server proxies /api here).
+app.route("/api", chatRoutes(registry, config));
+
+serve({ fetch: app.fetch, port: config.port });
+console.log(`freechat-server listening on http://localhost:${config.port}`);
